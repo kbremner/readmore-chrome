@@ -7,5 +7,9 @@
         "rootDir": "src",
         "outDir": "tmp/js",
         "noEmitOnError": true
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "__tests__/**"
+    ]
 }
