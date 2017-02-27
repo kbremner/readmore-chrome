@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
         document.getElementById("archive").onclick = sendEvent.bind(null, { type: "HANDLE_ARCHIVE" });
         document.getElementById("delete").onclick = sendEvent.bind(null, { type: "HANDLE_DELETE" });
         document.getElementById("next").onclick = sendEvent.bind(null, { type: "FETCH_NEXT" });
-        document.getElementById("repo-link").onclick = () => chrome.tabs.create({ url: "https://github.com/defining-technology/readmore-chrome", active: true });
-        document.getElementById("company-link").onclick = () => chrome.tabs.create({ url: "https://defining.tech", active: true });
+        document.getElementById("repo-link").onclick = () => tabs.createTab("https://github.com/defining-technology/readmore-chrome");
+        document.getElementById("company-link").onclick = () => tabs.createTab("https://defining.tech");
         sendEvent({ type: "POPUP_OPENED" }, () => document.getElementById("overlay-spinner").hidden = true);
     }
 });
