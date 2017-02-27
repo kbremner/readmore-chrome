@@ -1,8 +1,7 @@
 import TokenReceivedEventHandler from './TokenReceivedEventHandler';
 import FetchNextEventHandler from './FetchNextEventHandler';
 import PopupOpenedEventHandler from './PopupOpenedEventHandler';
-import HandleDeleteEventHandler from './HandleDeleteEventHandler';
-import HandleArchiveEventHandler from './HandleArchiveEventHandler';
+import PerformActionEventHandler from './PerformActionEventHandler';
 import IStorageManager from '../storage/IStorageManager';
 import ITabManager from '../tabs/ITabManager';
 import IActions from '../actions/IActions';
@@ -16,8 +15,8 @@ class RootEventHandler implements IEventHandler {
         this._storage = storage;
         this._handlers = {
             "FETCH_NEXT": new FetchNextEventHandler(storage, tabs, actions),
-            "HANDLE_ARCHIVE": new HandleArchiveEventHandler(storage, actions, this),
-            "HANDLE_DELETE": new HandleDeleteEventHandler(storage, actions, this),
+            "HANDLE_ARCHIVE": new PerformActionEventHandler("archive", storage, actions, this),
+            "HANDLE_DELETE": new PerformActionEventHandler("delete", storage, actions, this),
             "POPUP_OPENED": new PopupOpenedEventHandler(storage, tabs, this),
             "TOKEN_RECEIVED": new TokenReceivedEventHandler(storage, tabs, this)
         };
