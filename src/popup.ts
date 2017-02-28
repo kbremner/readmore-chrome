@@ -35,7 +35,7 @@ function sendEvent(event: any) {
             if(response.close) {
                 // background script wants the popup to close
                 close();
-            } else {
+            } else if(!response.keepSpinner) {
                 // make sure the spinner is no longer visible
                 document.getElementById("overlay-spinner").hidden = true;
             }
