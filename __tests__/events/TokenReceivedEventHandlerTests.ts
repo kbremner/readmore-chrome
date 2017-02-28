@@ -20,11 +20,10 @@ let rootHandler: IEventHandler;
 let eventHandler: TokenReceivedEventHandler;
 let response: any;
 
-const ARCHIVE_URL = "someurl";
 const WINDOW_ID = 12;
 const TAB_ID = 21;
+const OTHER_TAB_ID = 123;
 const ACCESS_TOKEN = "token";
-const NEW_ACCESS_TOKEN = "new-token";
 
 beforeEach(async () => {
     storage = new StorageManager();
@@ -32,20 +31,22 @@ beforeEach(async () => {
     actions = new Actions();
     rootHandler = new EventHandler(storage, tabs, actions);
 
+    tabs.getCurrentTab = jest.fn((windowId) => { return { id: OTHER_TAB_ID, windowId }; });
+
     eventHandler = new TokenReceivedEventHandler(storage, tabs, rootHandler);
-    response = await eventHandler.handle({ type: "TOKEN_RECEIVED", token: NEW_ACCESS_TOKEN, windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
+    response = await eventHandler.handle({ type: "TOKEN_RECEIVED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
 });
 
 test("Stores the access token", async () => {
     expect(storage.set).toHaveBeenCalledTimes(1);
-    expect(storage.set).toHaveBeenCalledWith({ access_token: NEW_ACCESS_TOKEN });
+    expect(storage.set).toHaveBeenCalledWith({ access_token: ACCESS_TOKEN });
 });
 
-test("Returns an empty response so the popup doesn't close", async() => {
-    expect(response).toEqual({});
+test("Response tells popup not to close but to keep spinner up", async() => {
+    expect(response).toEqual({ keepSpinner: true });
 });
 
-test("Fetches the next article", async () => {
+test("Fetches the next article with the ID of the current tab", async () => {
     expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID } as IEvent, NEW_ACCESS_TOKEN, undefined);
+    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", token: ACCESS_TOKEN, tabId: OTHER_TAB_ID, windowId: WINDOW_ID } as IEvent);
 });

@@ -1,11 +1,12 @@
 interface IEventHandler {
-    handle(event: IEvent, token: string, tabId: number): Promise<IResponse>
+    handle(event: IEvent): Promise<IResponse>
 }
 
 export interface IEvent {
     type: string
     windowId: number
-    token?: string
+    token: string
+    tabId?: number
 }
 
 export interface IResponse {

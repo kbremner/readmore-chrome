@@ -13,15 +13,16 @@ class TokenReceivedEventHandler implements IEventHandler {
         this._eventHandler = eventHandler;
     }
 
-    async handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
+    async handle(event: IEvent): Promise<IResponse> {
         await this._storage.set({ access_token: event.token });
         
         // updated the access token, now lets show an article in the current tab
         // (which will be the popup that the server redirected to)
-        await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId } as IEvent, event.token, undefined);
+        const tab = await this._tabs.getCurrentTab(event.windowId);
+        await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: tab.id, token: event.token } as IEvent);
 
         // Make sure to return an empty response so that the tab the popup was shown in isn't closed
-        return {};
+        return { keepSpinner: true };
     }
 }
 

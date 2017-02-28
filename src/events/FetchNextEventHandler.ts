@@ -14,21 +14,14 @@ class FetchNextEventHandler implements IEventHandler {
         this._actions = actions;
     }
 
-    async handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
+    async handle(event: IEvent): Promise<IResponse> {
         // get the next article and save the actions
-        const article = await this._actions.next(token);
+        const article = await this._actions.next(event.token);
         await this._storage.set({ actions: article.actions });
 
-        // get the ID of the current tab if we don't have an open tab
-        // (currently assume that given tab ID has already been validated, e.g. PopupOpenedEventHandler)
-        if(!tabId) {
-            const tab = await this._tabs.getCurrentTab(event.windowId);
-            tabId = tab.id;
-        }
-
         // update the tab URL and store the tab ID, before telling the popup to close
-        await this._tabs.updateTab(tabId, { url: article.url } as IUpdateTabProps);
-        await this._storage.set({ tab_id: tabId });
+        await this._tabs.updateTab(event.tabId, { url: article.url } as IUpdateTabProps);
+        await this._storage.set({ tab_id: event.tabId });
         return { close: true };
     }
 }

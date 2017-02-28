@@ -15,11 +15,11 @@ class PerformActionEventHandler implements IEventHandler {
         this._eventHandler = eventHandler;
     }
 
-    async handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
+    async handle(event: IEvent): Promise<IResponse> {
         const items = await this._storage.get("actions");
         await this._actions.performAction(items["actions"][this._actionName]);
         await this._storage.remove("actions");
-        return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId }, token, tabId);
+        return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: event.tabId, token: event.token });
     }
 }
 

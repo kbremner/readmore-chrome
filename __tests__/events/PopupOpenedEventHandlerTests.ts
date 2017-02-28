@@ -19,9 +19,10 @@ let actions: IActions;
 let rootHandler: IEventHandler;
 let eventHandler: PopupOpenedEventHandler;
 
-const ARCHIVE_URL = "someurl";
 const WINDOW_ID = 12;
 const TAB_ID = 21;
+const OTHER_TAB_ID = 13;
+const OTHER_WINDOW_ID = 31;
 const ACCESS_TOKEN = "token";
 
 beforeEach(async () => {
@@ -38,7 +39,7 @@ beforeEach(async () => {
 
 describe("if the tab ID is for the current tab", () => {
     test("returns empty response", async () => {
-        const response = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
+        const response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
         expect(response).toEqual({});
     });
 });
@@ -46,22 +47,20 @@ describe("if the tab ID is for the current tab", () => {
 describe("if tab with ID does not exist", () => {
     test("fetches next article without specifying tab ID", async () => {
         tabs.isCurrentTab = jest.fn(() => { throw new Error("test error"); });
+        tabs.getCurrentTab = jest.fn(() => { return { id: OTHER_TAB_ID, windowId: WINDOW_ID }; });
 
-        const response = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
+        const response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
 
         expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-        expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, ACCESS_TOKEN, undefined);
+        expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: OTHER_TAB_ID });
     });
 });
 
 describe("if the tab ID is for a tab other than the current tab", () => {
-    const OTHER_TAB_ID = 13;
-    const OTHER_WINDOW_ID = 31;
     let response;
-
     beforeEach(async () => {
         tabs.updateTab = jest.fn((tabId, props) => { return { id: tabId, windowId: OTHER_WINDOW_ID }; });
-        response = await eventHandler.handle({ type: "POPUP_OPENED", windowId: OTHER_WINDOW_ID } as IEvent, ACCESS_TOKEN, OTHER_TAB_ID);
+        response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: OTHER_WINDOW_ID, tabId: OTHER_TAB_ID } as IEvent);
     });
 
     test("makes the tab active", () => {

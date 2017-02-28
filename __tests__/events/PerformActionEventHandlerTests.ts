@@ -34,7 +34,7 @@ beforeEach(async () => {
   storage.get = jest.fn(() => Promise.resolve({ "actions": { "archive": ARCHIVE_URL } }));
 
   eventHandler = new PerformActionEventHandler("archive", storage, actions, rootHandler);
-  await eventHandler.handle({ type: "HANDLE_ARCHIVE", windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
+  await eventHandler.handle({ type: "HANDLE_ARCHIVE", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
 });
 
 test("performs archive with url from storage", () => {
@@ -45,7 +45,7 @@ test("performs archive with url from storage", () => {
 describe("after performing action", () => {
   test("fetches next article", async () => {
     expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, ACCESS_TOKEN, TAB_ID);
+    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID });
   });
 
   test("removes actions", () => {

@@ -22,12 +22,12 @@ class RootEventHandler implements IEventHandler {
         };
     }
 
-    public handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
+    public handle(event: IEvent): Promise<IResponse> {
         const handler = this._handlers[event.type];
         if(handler === undefined) {
             throw new Error(`Event type ${event.type} not supported`);
         }
-        return handler.handle(event, token, tabId);
+        return handler.handle(event);
     }
 }
 

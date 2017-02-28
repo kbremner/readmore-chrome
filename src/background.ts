@@ -32,9 +32,12 @@ async function handleInstall(details: chrome.runtime.InstalledDetails) {
 
 async function handleMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
     const items = await storage.get("access_token", "tab_id");
-    
     try {
-        const result = await eventHandler.handle(request, items["access_token"], items["tab_id"]);
+        request.tabId = items["tab_id"];
+        if(!request.token) {
+            request.token = items["access_token"];
+        }
+        const result = await eventHandler.handle(request);
         sendResponse(result);
     } catch(err) {
         sendResponse(err);
