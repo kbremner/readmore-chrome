@@ -36,7 +36,7 @@ beforeEach(async () => {
   eventHandler = new PopupOpenedEventHandler(storage, tabs, rootHandler);
 });
 
-describe("if tab ID is current tab", () => {
+describe("if the tab ID is for the current tab", () => {
     test("returns empty response", async () => {
         const response = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
         expect(response).toEqual({});
@@ -51,6 +51,31 @@ describe("if tab with ID does not exist", () => {
 
         expect(rootHandler.handle).toHaveBeenCalledTimes(1);
         expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, ACCESS_TOKEN, undefined);
+    });
+});
+
+describe("if the tab ID is for a tab other than the current tab", () => {
+    const OTHER_TAB_ID = 13;
+    const OTHER_WINDOW_ID = 31;
+    let response;
+
+    beforeEach(async () => {
+        tabs.updateTab = jest.fn((tabId, props) => { return { id: tabId, windowId: OTHER_WINDOW_ID }; });
+        response = await eventHandler.handle({ type: "POPUP_OPENED", windowId: OTHER_WINDOW_ID } as IEvent, ACCESS_TOKEN, OTHER_TAB_ID);
+    });
+
+    test("makes the tab active", () => {
+        expect(tabs.updateTab).toHaveBeenCalledTimes(1);
+        expect(tabs.updateTab).toHaveBeenCalledWith(OTHER_TAB_ID, { active: true });
+    });
+
+    test("focusses the tab's window", () => {
+        expect(tabs.updateWindow).toHaveBeenCalledTimes(1);
+        expect(tabs.updateWindow).toHaveBeenCalledWith(OTHER_WINDOW_ID, { active: true });
+    });
+
+    test("returns close response", () => {
+        expect(response).toEqual({ close: true });
     });
 });
 
