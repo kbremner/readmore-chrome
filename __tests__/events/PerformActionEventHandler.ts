@@ -19,43 +19,37 @@ let actions: IActions;
 let rootHandler: IEventHandler;
 let eventHandler: PerformActionEventHandler;
 
-beforeEach(() => {
+const ARCHIVE_URL = "someurl";
+const WINDOW_ID = 12;
+const TAB_ID = 21;
+const ACCESS_TOKEN = "token";
+
+beforeEach(async () => {
   storage = new StorageManager();
   tabs = new TabManager();
   actions = new Actions();
   rootHandler = new EventHandler(storage, tabs, actions);
 
   // update storage.get to return sensible defaults for these tests
-  storage.get = jest.fn(() => Promise.resolve({ "actions": { "archive": "someurl" } }));
+  storage.get = jest.fn(() => Promise.resolve({ "actions": { "archive": ARCHIVE_URL } }));
 
   eventHandler = new PerformActionEventHandler("archive", storage, actions, rootHandler);
+  await eventHandler.handle({ type: "HANDLE_ARCHIVE", windowId: WINDOW_ID } as IEvent, ACCESS_TOKEN, TAB_ID);
 });
 
-test("retrieves actions before performing action", () => {
-  const result = eventHandler.handle({ windowId: 12} as IEvent, "token", 21);
-
-  result.then(() => {
-    expect(storage.get).toHaveBeenCalledTimes(1);
-    expect(storage.get).toHaveBeenCalledWith("actions");
-  });
+test("performs archive with url from storage", () => {
+  expect(actions.performAction).toHaveBeenCalledTimes(1);
+  expect(actions.performAction).toHaveBeenCalledWith(ARCHIVE_URL);
 });
 
 describe("after performing action", () => {
-  test("fetches next article", () => {
-    const result = eventHandler.handle({ windowId: 12} as IEvent, "token", 21);
-
-    result.then(() => {
-      expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-      expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: 12 }, "token", 21);
-    });
+  test("fetches next article", async () => {
+    expect(rootHandler.handle).toHaveBeenCalledTimes(1);
+    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, ACCESS_TOKEN, TAB_ID);
   });
 
   test("removes actions", () => {
-    const result = eventHandler.handle({ windowId: 12} as IEvent, "token", 21);
-
-    result.then(() => {
-      expect(storage.remove).toHaveBeenCalledTimes(1);
-      expect(storage.remove).toHaveBeenCalledWith("actions");
-    });
+    expect(storage.remove).toHaveBeenCalledTimes(1);
+    expect(storage.remove).toHaveBeenCalledWith("actions");
   });
 });
