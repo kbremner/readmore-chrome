@@ -22,7 +22,7 @@ class ChromeStorageManager implements IStorageManager {
     }
 
     public remove(...keys: string[]) {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this._storage.remove(keys, () => handleLastError(resolve, reject, undefined));
         });
     }
