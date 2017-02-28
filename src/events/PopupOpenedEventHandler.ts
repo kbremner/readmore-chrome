@@ -13,16 +13,24 @@ class PopupOpenedEventHandler implements IEventHandler {
         this._eventHandler = eventHandler;
     }
 
-    handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
-        // if it's not focussed, do that
-        return this._tabs.isCurrentTab(tabId, event.windowId)
-            .then(isCurrent => isCurrent
-                        ? {} // empty response
-                        : this._tabs.updateTab(tabId, { active: true } as IUpdateTabProps)
-                            .then(tab => this._tabs.updateWindow(tab.windowId, { active: true } as IUpdateProps))
-                            .then(() => { return { close: true } }))
+    async handle(event: IEvent, token: string, tabId: number): Promise<IResponse> {
+        try {
+            const isCurrent = await this._tabs.isCurrentTab(tabId, event.windowId);
+            if(isCurrent) {
+                // no action taken, return an empty response
+                return {};
+            }
+
+            // not the current tab, so need to focus our tab and make sure the correct window is focussed
+            const tab = await this._tabs.updateTab(tabId, { active: true } as IUpdateTabProps);
+            await this._tabs.updateWindow(tab.windowId, { active: true } as IUpdateProps);
+
+            // tab has been focussed, so the popup can now close (if not already closed)
+            return { close: true };
+        } catch(err) {
             // tab doesn't exist anymore, load the next article
-            .catch(err => this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId }, token, undefined));
+            return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId }, token, undefined);
+        }
     }
 }
 

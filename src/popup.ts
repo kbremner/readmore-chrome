@@ -12,9 +12,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         return;
     }
 
-    // start the spinner
-    document.getElementById("overlay-spinner").hidden = false;
-
     // if we've been redirected to this page and there's an access token, need to store it
     const access_token = getQueryVariable("xAccessToken");
     if(access_token) {
@@ -25,19 +22,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
         document.getElementById("next").onclick = sendEvent.bind(null, { type: "FETCH_NEXT" });
         document.getElementById("repo-link").onclick = () => tabs.createTab("https://github.com/defining-technology/readmore-chrome");
         document.getElementById("company-link").onclick = () => tabs.createTab("https://defining.tech");
-        sendEvent({ type: "POPUP_OPENED" }, () => document.getElementById("overlay-spinner").hidden = true);
+        sendEvent({ type: "POPUP_OPENED" });
     }
 });
 
-function sendEvent(event: any, callback?: (response: any) => void) {
+function sendEvent(event: any) {
+    // start the spinner
     document.getElementById("overlay-spinner").hidden = false;
     chrome.windows.getCurrent(window => {
         event.windowId = window.id;
         chrome.runtime.sendMessage(event, (response) => {
             if(response.close) {
+                // background script wants the popup to close
                 close();
-            } else if(callback) {
-                callback(response);
+            } else {
+                // make sure the spinner is no longer visible
+                document.getElementById("overlay-spinner").hidden = true;
             }
         })
     });
