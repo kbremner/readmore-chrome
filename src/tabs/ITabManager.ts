@@ -4,6 +4,7 @@ interface ITabManager {
     updateWindow(windowId: number, props: IUpdateProps): Promise<IWindow>
     createTab(url: string): Promise<ITab>
     getCurrentTab(windowId: number): Promise<ITab>
+    getCurrentWindow(): Promise<IWindow>
 }
 
 export interface IUpdateProps {

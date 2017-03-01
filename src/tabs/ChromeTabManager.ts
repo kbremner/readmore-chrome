@@ -58,6 +58,12 @@ class ChromeTabManager implements ITabManager {
             chrome.tabs.query({ active: true, windowId: windowId }, tabs => handleLastError(resolve, reject, tabs[0]));
         });
     }
+
+    getCurrentWindow() {
+        return new Promise<chrome.windows.Window>((resolve, reject) => {
+            chrome.windows.getCurrent(window => handleLastError(resolve, reject, window));
+        });
+    }
 }
 
 export default ChromeTabManager;

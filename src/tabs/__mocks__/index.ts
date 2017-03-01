@@ -6,6 +6,7 @@ class MockTabManager implements ITabManager {
     updateWindow: (windowId: number, props: IUpdateProps) => Promise<IWindow>
     createTab: (url: string) => Promise<ITab>
     getCurrentTab: (windowId: number) => Promise<ITab>
+    getCurrentWindow: () => Promise<IWindow>
 
     constructor() {
         this.isCurrentTab = jest.fn((tabId, windowId) => Promise.resolve(true));
@@ -13,6 +14,7 @@ class MockTabManager implements ITabManager {
         this.updateWindow = jest.fn((windowId, props) => Promise.resolve({ id: 2 } as IWindow));
         this.createTab = jest.fn(url => Promise.resolve({ id: 1, windowId: 2 } as ITab));
         this.getCurrentTab = jest.fn(windowId => Promise.resolve({ id: 1, windowId: 2 } as ITab));
+        this.getCurrentWindow = jest.fn(() => Promise.resolve({ id: 2 } as IWindow));
     }
 }
 
