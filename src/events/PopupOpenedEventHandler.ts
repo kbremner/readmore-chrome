@@ -29,7 +29,7 @@ class PopupOpenedEventHandler implements IEventHandler {
             return { close: true };
         } catch(err) {
             // tab doesn't exist anymore, load the next article
-            return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: undefined, token: event.token });
+            return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: null, token: event.token });
         }
     }
 }

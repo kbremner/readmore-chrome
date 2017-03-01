@@ -32,7 +32,7 @@ class CommandReceivedEventHandler implements IEventHandler {
             // if the user requested the next article, fetch it
             if(event.command === "FETCH_NEXT") {
                 event.type = event.command;
-                event.tabId = undefined;
+                event.tabId = null;
                 return await this._eventHandler.handle(event);
             }
         }
