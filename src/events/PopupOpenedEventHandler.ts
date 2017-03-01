@@ -29,8 +29,7 @@ class PopupOpenedEventHandler implements IEventHandler {
             return { close: true };
         } catch(err) {
             // tab doesn't exist anymore, load the next article
-            const tab = await this._tabs.getCurrentTab(event.windowId);
-            return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: tab.id, token: event.token });
+            return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: undefined, token: event.token });
         }
     }
 }
