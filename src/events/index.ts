@@ -10,10 +10,12 @@ import { default as IEventHandler, IEvent, IResponse } from '../events/IEventHan
 
 class RootEventHandler implements IEventHandler {
     private _storage: IStorageManager
+    private _tabs: ITabManager
     private _handlers: { [key: string] : IEventHandler }
 
     constructor(storage: IStorageManager, tabs: ITabManager, actions: IActions) {
         this._storage = storage;
+        this._tabs = tabs;
         this._handlers = {
             "COMMAND_RECEIVED": new CommandReceivedEventHandler(storage, tabs, this),
             "FETCH_NEXT": new FetchNextEventHandler(storage, tabs, actions),
@@ -24,11 +26,26 @@ class RootEventHandler implements IEventHandler {
         };
     }
 
-    public handle(event: IEvent): Promise<IResponse> {
+    public async handle(event: IEvent): Promise<IResponse> {
         const handler = this._handlers[event.type];
         if(handler === undefined) {
             throw new Error(`Event type ${event.type} not supported`);
         }
+       
+        // enrich the event, as required
+        if(event.token === undefined) {
+            const items = await this._storage.get("access_token");
+            event.token = items["access_token"];
+        }
+        if(event.tabId === undefined) {
+            const items = await this._storage.get("tab_id");
+            event.tabId = items["tab_id"];
+        }
+        if(event.windowId === undefined) {
+            const window = await this._tabs.getCurrentWindow();
+            event.windowId = window.id;
+        }
+
         return handler.handle(event);
     }
 }

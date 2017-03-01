@@ -20,14 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 async function handleCommand(command: string) {
-    const items = await storage.get("access_token", "tab_id");
-    const request = {
-        type: "COMMAND_RECEIVED",
-        command,
-        tabId: items["tab_id"],
-        token: items["access_token"]
-    } as IEvent;
-    await eventHandler.handle(request);
+    await eventHandler.handle({ type: "COMMAND_RECEIVED", command } as IEvent);
 }
 
 async function handleInstall(details: chrome.runtime.InstalledDetails) {
@@ -45,12 +38,7 @@ async function handleInstall(details: chrome.runtime.InstalledDetails) {
 }
 
 async function handleMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
-    const items = await storage.get("access_token", "tab_id");
     try {
-        request.tabId = items["tab_id"];
-        if(!request.token) {
-            request.token = items["access_token"];
-        }
         const result = await eventHandler.handle(request);
         sendResponse(result);
     } catch(err) {

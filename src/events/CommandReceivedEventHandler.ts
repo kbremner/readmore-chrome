@@ -14,10 +14,6 @@ class CommandReceivedEventHandler implements IEventHandler {
     }
 
     async handle(event: IEvent): Promise<IResponse> {
-        // didn't get window ID from a popup, so need to get the ID of the current window
-        const window = await this._tabs.getCurrentWindow();
-        event.windowId = window.id;
-
         try {
             const isCurrent = await this._tabs.isCurrentTab(event.tabId, event.windowId);
             if(!isCurrent) {

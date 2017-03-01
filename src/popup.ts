@@ -28,18 +28,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 function sendEvent(event: any) {
     // start the spinner
-    document.getElementById("overlay-spinner").hidden = false;
-    chrome.windows.getCurrent(window => {
-        event.windowId = window.id;
-        chrome.runtime.sendMessage(event, (response) => {
-            if(response.close) {
-                // background script wants the popup to close
-                close();
-            } else if(!response.keepSpinner) {
-                // make sure the spinner is no longer visible
-                document.getElementById("overlay-spinner").hidden = true;
-            }
-        })
+    const spinner = document.getElementById("overlay-spinner");
+    spinner.hidden = false;
+    chrome.runtime.sendMessage(event, (response) => {
+        if(response.close) {
+            // background script wants the popup to close
+            close();
+        } else if(!response.keepSpinner) {
+            // make sure the spinner is no longer visible
+            spinner.hidden = true;
+        }
     });
 }
 
