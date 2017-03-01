@@ -3,18 +3,32 @@ import StorageManager from './storage';
 import TabManager from './tabs';
 import Actions from './actions';
 import EventHandler from './events';
+import { IEvent } from './events/IEventHandler';
 
 const storage = new StorageManager();
 const tabs = new TabManager();
 const actions = new Actions();
 const eventHandler = new EventHandler(storage, tabs, actions);
 
+chrome.commands.onCommand.addListener(handleCommand);
 chrome.runtime.onInstalled.addListener(handleInstall);
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     handleMessage(request, sender, sendResponse);
     // response will be sent asynchronously
     return true;
 });
+
+
+async function handleCommand(command: string) {
+    const items = await storage.get("access_token", "tab_id");
+    const request = {
+        type: "COMMAND_RECEIVED",
+        command,
+        tabId: items["tab_id"],
+        token: items["access_token"]
+    } as IEvent;
+    await eventHandler.handle(request);
+}
 
 async function handleInstall(details: chrome.runtime.InstalledDetails) {
     if(details.reason != "install") {

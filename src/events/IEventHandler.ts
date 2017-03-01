@@ -7,6 +7,7 @@ export interface IEvent {
     windowId: number
     token: string
     tabId?: number
+    command?: string
 }
 
 export interface IResponse {
