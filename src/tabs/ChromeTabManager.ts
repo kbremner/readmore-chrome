@@ -2,9 +2,27 @@ import { default as ITabManager, IUpdateTabProps, IUpdateProps } from './ITabMan
 import { handleLastError } from '../chrome';
 
 class ChromeTabManager implements ITabManager {
-    isCurrentTab(tabId: number, windowId: number) {
-        return this.queryTabs({ windowId: windowId, active: true})
-            .then(tabs => tabs.findIndex(tab => tab.id == tabId) !== -1);
+    async isCurrentTab(tabId: number, windowId: number) {
+        /* 
+         * We can't just ask if the tab's window is focused, as the
+         * window is not focused when the popup is shown...
+         * The popup gives us the ID of the window it is open in,
+         * so we can check if the tab is active in that window.
+         */
+        const results = await this.queryTabs({ windowId, active: true });
+        return results.findIndex(tab => tab.id === tabId) !== -1;
+    }
+
+    private getWindow(windowId: number) {
+        return new Promise<chrome.windows.Window>((resolve, reject) => {
+            chrome.windows.get(windowId, window => handleLastError(resolve, reject, window));
+        });
+    }
+
+    private getTab(tabId: number) {
+        return new Promise<chrome.tabs.Tab>((resolve, reject) => {
+            chrome.tabs.get(tabId, tab => handleLastError(resolve, reject, tab));
+        });
     }
 
     private queryTabs(queryInfo: chrome.tabs.QueryInfo) {
@@ -14,7 +32,7 @@ class ChromeTabManager implements ITabManager {
     }
 
     updateTab(tabId: number, props: IUpdateTabProps) {
-         return new Promise<chrome.tabs.Tab>((resolve, reject) => {
+        return new Promise<chrome.tabs.Tab>((resolve, reject) => {
             chrome.tabs.update(tabId, props, tab => handleLastError(resolve, reject, tab));
         });
     }
