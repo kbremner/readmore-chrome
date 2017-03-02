@@ -14,7 +14,7 @@ class InstalledEventHandler implements IEventHandler {
     async handle(event: IEvent): Promise<IResponse> {
         if(event.command === "install") {
             // first time install, so trigger the auth process
-            return this._rootHandler.handle({ type: "PERFORM_AUTH", windowId: event.windowId, tabId: event.tabId } as IEvent);
+            return this._rootHandler.handle({ type: "PERFORM_AUTH", token: event.token, windowId: event.windowId, tabId: event.tabId } as IEvent);
         }
         // not first time install, return an empty response
         return {};
