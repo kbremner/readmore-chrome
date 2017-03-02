@@ -64,7 +64,7 @@ class ChromeTabManager implements ITabManager {
             const getInfo = {
                 windowTypes: ["normal"]
             } as chrome.windows.GetInfo;
-            chrome.windows.getCurrent(getInfo, window => handleLastError(resolve, reject, window));
+            chrome.windows.getLastFocused(getInfo, window => handleLastError(resolve, reject, window));
         });
     }
 }
