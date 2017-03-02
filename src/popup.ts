@@ -26,10 +26,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }
 });
 
-function sendEvent(event: any) {
+async function sendEvent(event: any) {
     // start the spinner
     const spinner = document.getElementById("overlay-spinner");
     spinner.hidden = false;
+
+    // get the current window
+    // need to do this as the current/last-focused window from the
+    // point of view of the background script is not always the
+    // one the user is actually looking at... There are some
+    // confusing rules around "current" window, so easiest thing
+    // is to take it from the point of view of the popup.
+    const currentWindow = await tabs.getCurrentWindow();
+    event.windowId = currentWindow.id;
+
     chrome.runtime.sendMessage(event, (response) => {
         if(response.close) {
             // background script wants the popup to close
