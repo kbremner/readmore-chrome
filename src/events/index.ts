@@ -3,6 +3,8 @@ import FetchNextEventHandler from './FetchNextEventHandler';
 import PopupOpenedEventHandler from './PopupOpenedEventHandler';
 import PerformActionEventHandler from './PerformActionEventHandler';
 import CommandReceivedEventHandler from './CommandReceivedEventHandler';
+import InstalledEventHandler from './InstalledEventHandler';
+import PerformAuthEventHandler from './PerformAuthEventHandler';
 import IStorageManager from '../storage/IStorageManager';
 import ITabManager from '../tabs/ITabManager';
 import IActions from '../actions/IActions';
@@ -22,7 +24,9 @@ class RootEventHandler implements IEventHandler {
             "HANDLE_ARCHIVE": new PerformActionEventHandler("archive", storage, actions, this),
             "HANDLE_DELETE": new PerformActionEventHandler("delete", storage, actions, this),
             "POPUP_OPENED": new PopupOpenedEventHandler(storage, tabs, this),
-            "TOKEN_RECEIVED": new TokenReceivedEventHandler(storage, tabs, this)
+            "TOKEN_RECEIVED": new TokenReceivedEventHandler(storage, tabs, this),
+            "INSTALLED": new InstalledEventHandler(this),
+            "PERFORM_AUTH": new PerformAuthEventHandler(tabs)
         };
     }
 

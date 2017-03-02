@@ -24,17 +24,7 @@ async function handleCommand(command: string) {
 }
 
 async function handleInstall(details: chrome.runtime.InstalledDetails) {
-    if(details.reason != "install") {
-        return; // only want to handle first-time install
-    }
-
-    const items = await storage.get("access_token");
-    if(items["access_token"] === undefined) {
-        // no token, so need to open a tab for the user to start the oauth process,
-        // redirecting them back to the extension when oauth flow has been completed
-        const redirect_url = chrome.extension.getURL('html/popup.html');
-        await tabs.createTab(`$baseUri/api/pocket/authorize?redirectUrl=${encodeURIComponent(redirect_url)}`);
-    }
+    await eventHandler.handle({ type: "INSTALLED", command: details.reason } as IEvent);
 }
 
 async function handleMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
