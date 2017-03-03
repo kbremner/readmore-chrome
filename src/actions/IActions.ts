@@ -5,7 +5,12 @@ interface IActions {
 
 export interface IArticle {
     url: string
-    actions: { delete: string, archive: string }
+    actions: IArticleActions
+}
+
+export interface IArticleActions {
+    archive: string,
+    delete: string
 }
 
 export default IActions;
