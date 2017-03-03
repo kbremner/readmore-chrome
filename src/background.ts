@@ -28,10 +28,18 @@ async function handleInstall(details: chrome.runtime.InstalledDetails) {
 }
 
 async function handleMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
+    let result;
+    let error;
     try {
-        const result = await eventHandler.handle(request);
+        result = await eventHandler.handle(request);
+    } catch(err) {
+        error = err;
+    }
+    
+    try {
+        result = result !== undefined ? result : error;
         sendResponse(result);
     } catch(err) {
-        sendResponse(err);
+        console.warn("Failed to send response", JSON.stringify(result), ":\n",err);
     }
 }
