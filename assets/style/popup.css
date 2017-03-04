@@ -53,7 +53,7 @@
 }
 
 .error-msg {
-    padding-top: 10px;
+    padding-top: 0.6em;
     text-align: center;
 }
 html, body {
@@ -64,12 +64,13 @@ body {
     font-size: 100%;
     margin: 0;
     color: white;
+    height: 7.5em;
+    width: 10em;
 }
 p {
-    min-width: 150px;
     margin: 0;
     cursor: default;
-    padding: 5px;
+    padding: 0.3em;
 }
 
 p:hover {
@@ -80,16 +81,11 @@ p:active {
     background-color: #bfc9d3;
 }
 
-#react-root {
-    height: 95px;
-    width: 155px;
-}
-
 span {
     font-size: 60%;
     text-align: center;
     display: block;
-    padding: 5px;
+    padding: 0.3em;
 }
 
 a {
