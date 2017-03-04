@@ -1,65 +1,105 @@
-jest.mock('../../src/storage');
-jest.mock('../../src/events');
+jest.mock('../../src/storage/StoreDataMap');
 jest.mock('../../src/actions');
 jest.mock('../../src/tabs');
 
 import FetchNextEventHandler from '../../src/events/FetchNextEventHandler';
-import IStorageManager from '../../src/storage/IStorageManager';
-import StorageManager from '../../src/storage';
+import { default as IStorageManager, IStoreData } from '../../src/storage/IStorageManager';
+import StoreDataMap from '../../src/storage/StoreDataMap';
 import ITabManager from '../../src/tabs/ITabManager';
 import TabManager from '../../src/tabs';
 import IActions from '../../src/actions/IActions';
 import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent } from '../../src/events/IEventHandler';
-import EventHandler from '../../src/events';
+import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
 
-let storage: IStorageManager;
+let storeData: IStoreData;
+let updatedStore: IStoreData;
+let updatedStore2: IStoreData;
 let tabs: ITabManager;
 let actions: IActions;
-let rootHandler: IEventHandler;
 let eventHandler: FetchNextEventHandler;
-let response: any;
+let result: IResponse;
 
-const ARCHIVE_URL = "someurl";
+const ARCHIVE_URL = "archiveurl";
+const ARTICLE_URL = "articleurl";
 const WINDOW_ID = 12;
 const TAB_ID = 21;
+const NEW_TAB_ID = 22;
 const ACCESS_TOKEN = "token";
-const NEXT_ACTION_RESULT = { actions: { archive: "archiveurl", delete: "deleteurl" }, url: "articleurl" };
+const EXPECTED_RESPONSE = { test: true };
+const NEXT_ACTION_RESULT = { actions: { archive: ARCHIVE_URL }, url: ARTICLE_URL };
 
-/*
 beforeEach(async () => {
-    storage = new StorageManager();
     tabs = new TabManager();
     actions = new Actions();
-    rootHandler = new EventHandler(storage, tabs, actions);
+    storeData = new StoreDataMap(null, null, null);
+    updatedStore = new StoreDataMap(null, null, null);
+    updatedStore2 = new StoreDataMap(null, null, null);
 
+    storeData.getToken = jest.fn(() => ACCESS_TOKEN);
+    storeData.setActions = jest.fn(() => updatedStore);
+    updatedStore.setTabId = jest.fn(() => updatedStore2);
     actions.next = jest.fn(() => Promise.resolve(NEXT_ACTION_RESULT));
 
-    eventHandler = new FetchNextEventHandler(storage, tabs, actions);
-    response = await eventHandler.handle({ type: "FETCH_NEXT", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
+    eventHandler = new FetchNextEventHandler(tabs, actions);
 });
 
-test("Executes the next action", () => {
-    expect(actions.next).toHaveBeenCalledTimes(1);
-    expect(actions.next).toHaveBeenCalledWith(ACCESS_TOKEN);
+describe("when tab ID is set", () => {
+    let result: IResponse;
+    beforeEach(async () => {
+        updatedStore.getTabId = jest.fn(() => TAB_ID);
+        tabs.updateTab = jest.fn(() => Promise.resolve());
+        result = await eventHandler.handle({ type: "FETCH_NEXT", windowId: WINDOW_ID } as IEvent, storeData);
+    });
+
+    test("gets next article", () => {
+        expect(actions.next).toHaveBeenCalledTimes(1);
+        expect(actions.next).toHaveBeenCalledWith(ACCESS_TOKEN);
+    });
+
+    test("adds the received actions to the store", () => {
+        expect(storeData.setActions).toHaveBeenCalledTimes(1);
+        expect(storeData.setActions).toHaveBeenCalledWith(NEXT_ACTION_RESULT.actions);
+    });
+
+    test("updates specified tab", () => {
+        expect(tabs.updateTab).toHaveBeenCalledTimes(1);
+        expect(tabs.updateTab).toHaveBeenCalledWith(TAB_ID, { url: ARTICLE_URL });
+    });
+
+    test("returns store with updated actions", () => {
+        expect(result).toEqual({ close: true, store: updatedStore });
+    });
 });
 
-test("Stores the actions from the action result", () => {
-    expect(storage.set).toHaveBeenCalledWith({ actions: NEXT_ACTION_RESULT.actions });
-});
+describe("when tab ID is not set", () => {
+    let result: IResponse;
+    beforeEach(async () => {
+        updatedStore.getTabId = jest.fn(() => undefined);
+        tabs.createTab = jest.fn(() => Promise.resolve({ id: NEW_TAB_ID }));
+        result = await eventHandler.handle({ type: "FETCH_NEXT", windowId: WINDOW_ID } as IEvent, storeData);
+    });
 
-test("updates the URL of the tab with the specified ID", () => {
-    expect(tabs.updateTab).toHaveBeenCalledTimes(1);
-    expect(tabs.updateTab).toHaveBeenCalledWith(TAB_ID, { url: NEXT_ACTION_RESULT.url });
-});
+    test("gets next article", () => {
+        expect(actions.next).toHaveBeenCalledTimes(1);
+        expect(actions.next).toHaveBeenCalledWith(ACCESS_TOKEN);
+    });
 
-test("Stores the tab ID from the event", () => {
-    expect(storage.set).toHaveBeenCalledWith({ tab_id: TAB_ID });
-});
+    test("adds the received actions to the store", () => {
+        expect(storeData.setActions).toHaveBeenCalledTimes(1);
+        expect(storeData.setActions).toHaveBeenCalledWith(NEXT_ACTION_RESULT.actions);
+    });
 
-test("Result tells popup to close", () => {
-    expect(response).toEqual({ close: true });
-});
-*/
+    test("creates a new tab", () => {
+        expect(tabs.createTab).toHaveBeenCalledTimes(1);
+        expect(tabs.createTab).toHaveBeenCalledWith(ARTICLE_URL);
+    });
 
-test("empty", () => {});
+    test("stores ID of new tab", () => {
+        expect(updatedStore.setTabId).toHaveBeenCalledTimes(1);
+        expect(updatedStore.setTabId).toHaveBeenCalledWith(NEW_TAB_ID);
+    });
+    
+    test("returns store with updated tab ID", () => {
+        expect(result).toEqual({ close: true, store: updatedStore2 });
+    });
+});
