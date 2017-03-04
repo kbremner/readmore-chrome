@@ -1,4 +1,3 @@
-jest.mock('../../src/storage/StoreDataMap');
 jest.mock('../../src/events');
 jest.mock('../../src/actions');
 jest.mock('../../src/tabs');
@@ -8,13 +7,12 @@ import { default as IStorageManager, IStoreData } from '../../src/storage/IStora
 import StoreDataMap from '../../src/storage/StoreDataMap';
 import ITabManager from '../../src/tabs/ITabManager';
 import TabManager from '../../src/tabs';
-import IActions from '../../src/actions/IActions';
+import { default as IActions, IArticleActions } from '../../src/actions/IActions';
 import Actions from '../../src/actions';
 import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
 import EventHandler from '../../src/events';
 
 let storeData: IStoreData;
-let updatedStore: IStoreData;
 let tabs: ITabManager;
 let actions: IActions;
 let rootHandler: IEventHandler;
@@ -31,12 +29,9 @@ beforeEach(async () => {
     tabs = new TabManager();
     actions = new Actions();
     rootHandler = new EventHandler(tabs, actions);
-    storeData = new StoreDataMap(null, null, null);
-    updatedStore = new StoreDataMap(null, null, null);
+    storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, { "archive": ARCHIVE_URL } as IArticleActions);
 
     // update storage.get to return sensible defaults for these tests
-    storeData.getActions = jest.fn(() => { return { "archive": ARCHIVE_URL }; });
-    storeData.setActions = jest.fn(() => updatedStore);
     rootHandler.handle = jest.fn(() => Promise.resolve(EXPECTED_RESPONSE));
 
     eventHandler = new PerformActionEventHandler("archive", actions, rootHandler);
@@ -48,18 +43,12 @@ test("performs archive with url from storage", () => {
     expect(actions.performAction).toHaveBeenCalledWith(ARCHIVE_URL);
 });
 
-describe("after performing action", () => {
-    test("fetches next article with updated store", async () => {
-        expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-        expect((rootHandler.handle as any).mock.calls[0]).toEqual([{ type: "FETCH_NEXT", windowId: WINDOW_ID }, updatedStore]);
-    });
+test("fetches next article with store that has no actions", () => {
+    const expectedStore = storeData.setActions(null);
+    expect(rootHandler.handle).toHaveBeenCalledTimes(1);
+    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, expectedStore);
+});
 
-    test("removes actions", () => {
-        expect(storeData.setActions).toHaveBeenCalledTimes(1);
-        expect(storeData.setActions).toHaveBeenCalledWith(null);
-    });
-
-    test("returns result of FETCH_NEXT event", async () => {
-        expect(result).toEqual(EXPECTED_RESPONSE);
-    });
+test("returns result of FETCH_NEXT event", () => {
+    expect(result).toEqual(EXPECTED_RESPONSE);
 });

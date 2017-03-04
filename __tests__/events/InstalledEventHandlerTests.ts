@@ -1,5 +1,4 @@
 jest.mock('../../src/events');
-jest.mock('../../src/storage/StoreDataMap');
 
 import InstalledEventHandler from '../../src/events/InstalledEventHandler';
 import { default as IEventHandler, IEvent } from '../../src/events/IEventHandler';
@@ -17,7 +16,7 @@ const ACCESS_TOKEN = "token";
 
 beforeEach(async () => {
   rootHandler = new EventHandler(null, null);
-  storeData = new StoreDataMap(null, null, null);
+  storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, null);
 
   eventHandler = new InstalledEventHandler(rootHandler);
 });
