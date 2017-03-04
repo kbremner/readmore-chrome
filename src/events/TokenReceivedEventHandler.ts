@@ -1,28 +1,23 @@
-import IStorageManager from '../storage/IStorageManager';
 import ITabManager from '../tabs/ITabManager';
 import { default as IEventHandler, IEvent, IResponse } from './IEventHandler';
+import { IStoreData } from '../storage/IStorageManager';
 
 class TokenReceivedEventHandler implements IEventHandler {
-    private _storage: IStorageManager
     private _tabs: ITabManager
     private _eventHandler: IEventHandler
 
-    constructor(storage: IStorageManager, tabs: ITabManager, eventHandler: IEventHandler) {
-        this._storage = storage;
+    constructor(tabs: ITabManager, eventHandler: IEventHandler) {
         this._tabs = tabs;
         this._eventHandler = eventHandler;
     }
 
-    async handle(event: IEvent): Promise<IResponse> {
-        await this._storage.set({ access_token: event.token });
-        
-        // updated the access token, now lets show an article in the current tab
-        // (which will be the popup that the server redirected to)
+    async handle(event: IEvent, data: IStoreData): Promise<IResponse> {
+        // show an article in the current tab (which will be the popup that the server redirected to)
         const tab = await this._tabs.getCurrentTab(event.windowId);
-        await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId, tabId: tab.id, token: event.token } as IEvent);
-
-        // Make sure to return an empty response so that the tab the popup was shown in isn't closed
-        return { keepSpinner: true };
+        data = data.setTabId(tab.id);
+        data = data.setToken(event.token);
+        const result = await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId } as IEvent, data);
+        return { keepSpinner: true, store: result.store };
     }
 }
 

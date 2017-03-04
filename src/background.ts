@@ -8,7 +8,7 @@ import { IEvent } from './events/IEventHandler';
 const storage = new StorageManager();
 const tabs = new TabManager();
 const actions = new Actions();
-const eventHandler = new EventHandler(storage, tabs, actions);
+const eventHandler = new EventHandler(tabs, actions);
 
 chrome.commands.onCommand.addListener(handleCommand);
 chrome.runtime.onInstalled.addListener(handleInstall);
@@ -18,20 +18,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
-
 async function handleCommand(command: string) {
-    await eventHandler.handle({ type: "COMMAND_RECEIVED", command } as IEvent);
+    await handleMessage({ type: "COMMAND_RECEIVED", command }, null, () => {});
 }
 
 async function handleInstall(details: chrome.runtime.InstalledDetails) {
-    await eventHandler.handle({ type: "INSTALLED", command: details.reason } as IEvent);
+    await handleMessage({ type: "INSTALLED", command: details.reason }, null, () => {});
 }
 
 async function handleMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
     let result;
     let error;
-    try {
-        result = await eventHandler.handle(request);
+    try {   
+        const data = await storage.getAll();
+        result = await eventHandler.handle(request, data);
+        await storage.update(result.store);
     } catch(err) {
         error = err;
     }
@@ -40,6 +41,6 @@ async function handleMessage(request: any, sender: chrome.runtime.MessageSender,
         result = result !== undefined ? result : error;
         sendResponse(result);
     } catch(err) {
-        console.warn("Failed to send response", JSON.stringify(result), ":\n",err);
+        console.warn("Failed to send response", JSON.stringify(result), "\n",err);
     }
 }

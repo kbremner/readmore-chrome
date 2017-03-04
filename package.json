@@ -13,7 +13,7 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "@types/chrome": "0.0.40",
     "@types/jest": "^18.1.1",
     "browserify": "^13.1.0",
@@ -21,10 +21,14 @@
     "copyfiles": "^1.2.0",
     "jest": "^18.1.0",
     "rimraf": "^2.5.4",
-    "typescript": "^2.2.1"
+    "typescript": "^2.2.1",
+    "immutable": "^3.8.1"
   },
   "jest": {
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "transform": {
       "^.+\\.(ts|tsx)$": "<rootDir>/scripts/preprocessor.js"
     },
