@@ -1,52 +1,66 @@
-jest.mock('../../src/storage');
 jest.mock('../../src/events');
-jest.mock('../../src/actions');
 jest.mock('../../src/tabs');
 
 import TokenReceivedEventHandler from '../../src/events/TokenReceivedEventHandler';
-import IStorageManager from '../../src/storage/IStorageManager';
-import StorageManager from '../../src/storage';
+import { IStoreData } from '../../src/storage/IStorageManager';
+import StoreDataMap from '../../src/storage/StoreDataMap';
 import ITabManager from '../../src/tabs/ITabManager';
 import TabManager from '../../src/tabs';
-import IActions from '../../src/actions/IActions';
-import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent } from '../../src/events/IEventHandler';
+import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
 import EventHandler from '../../src/events';
 
-let storage: IStorageManager;
+let storeData: IStoreData;
+let otherStoreData: IStoreData;
 let tabs: ITabManager;
-let actions: IActions;
 let rootHandler: IEventHandler;
 let eventHandler: TokenReceivedEventHandler;
-let response: any;
+let response: IResponse;
 
 const WINDOW_ID = 12;
 const TAB_ID = 21;
 const OTHER_TAB_ID = 123;
 const ACCESS_TOKEN = "token";
+const NEW_ACCESS_TOKEN = "new-token";
 
 beforeEach(async () => {
-    storage = new StorageManager();
+    storeData = new StoreDataMap(ACCESS_TOKEN, null, null);
+    otherStoreData = new StoreDataMap(null, null, null);
     tabs = new TabManager();
-    actions = new Actions();
-    rootHandler = new EventHandler(storage, tabs, actions);
+    rootHandler = new EventHandler(null, null);
 
-    tabs.getCurrentTab = jest.fn((windowId) => { return { id: OTHER_TAB_ID, windowId }; });
+    rootHandler.handle = jest.fn(() => Promise.resolve({ test: true, store: otherStoreData }));
+    tabs.getCurrentTab = jest.fn(() => Promise.resolve({ id: TAB_ID }));
 
-    eventHandler = new TokenReceivedEventHandler(storage, tabs, rootHandler);
-    response = await eventHandler.handle({ type: "TOKEN_RECEIVED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
+    eventHandler = new TokenReceivedEventHandler(tabs, rootHandler);
+    response = await eventHandler.handle({ type: "TOKEN_RECEIVED", token: NEW_ACCESS_TOKEN, windowId: WINDOW_ID }, storeData);
 });
 
-test("Stores the access token", async () => {
-    expect(storage.set).toHaveBeenCalledTimes(1);
-    expect(storage.set).toHaveBeenCalledWith({ access_token: ACCESS_TOKEN });
+test("returns result telling the popup to keep the spinner up", () => {
+    expect(response.keepSpinner).toBe(true);
 });
 
-test("Response tells popup not to close but to keep spinner up", async() => {
-    expect(response).toEqual({ keepSpinner: true });
+test("returns result with store returned by handling of FETCH_NEXT event", () => {
+    expect(response.store).toEqual(otherStoreData);
 });
 
-test("Fetches the next article with the ID of the current tab", async () => {
-    expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-    expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", token: ACCESS_TOKEN, tabId: OTHER_TAB_ID, windowId: WINDOW_ID } as IEvent);
+test("gets the current tab", () => {
+    expect(tabs.getCurrentTab).toHaveBeenCalledTimes(1);
+    expect(tabs.getCurrentTab).toHaveBeenCalledWith(WINDOW_ID);
+});
+
+describe("fetches the next article", () => {
+    test("once", () => {
+        expect(rootHandler.handle).toHaveBeenCalledTimes(1);
+        expect((rootHandler.handle as any).mock.calls[0][0]).toEqual({ type: "FETCH_NEXT", windowId: WINDOW_ID });
+    });
+
+    test("with store containing ID of current tab", () => {
+        const storeForEvent = (rootHandler.handle as any).mock.calls[0][1] as IStoreData;
+        expect(storeForEvent.getTabId()).toEqual(TAB_ID);
+    });
+
+    test("with store containing new token", () => {
+        const storeForEvent = (rootHandler.handle as any).mock.calls[0][1] as IStoreData;
+        expect(storeForEvent.getToken()).toEqual(NEW_ACCESS_TOKEN);
+    });
 });
