@@ -1,21 +1,16 @@
-jest.mock('../../src/storage');
 jest.mock('../../src/events');
-jest.mock('../../src/actions');
 jest.mock('../../src/tabs');
 
 import PopupOpenedEventHandler from '../../src/events/PopupOpenedEventHandler';
-import IStorageManager from '../../src/storage/IStorageManager';
-import StorageManager from '../../src/storage';
+import { IStoreData } from '../../src/storage/IStorageManager';
+import StoreDataMap from '../../src/storage/StoreDataMap';
 import ITabManager from '../../src/tabs/ITabManager';
 import TabManager from '../../src/tabs';
-import IActions from '../../src/actions/IActions';
-import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent } from '../../src/events/IEventHandler';
+import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
 import EventHandler from '../../src/events';
 
-let storage: IStorageManager;
+let storeData: IStoreData;
 let tabs: ITabManager;
-let actions: IActions;
 let rootHandler: IEventHandler;
 let eventHandler: PopupOpenedEventHandler;
 
@@ -26,55 +21,69 @@ const OTHER_WINDOW_ID = 31;
 const ACCESS_TOKEN = "token";
 
 beforeEach(async () => {
-  storage = new StorageManager();
-  tabs = new TabManager();
-  actions = new Actions();
-  rootHandler = new EventHandler(storage, tabs, actions);
-
-  // update methods to return sensible defaults for these tests
-  tabs.isCurrentTab = jest.fn((tabId, windowId) => Promise.resolve(windowId === WINDOW_ID && tabId === TAB_ID));
-
-  eventHandler = new PopupOpenedEventHandler(storage, tabs, rootHandler);
+    tabs = new TabManager();
+    rootHandler = new EventHandler(null, null);
+    eventHandler = new PopupOpenedEventHandler(tabs, rootHandler);
 });
 
-describe("if the tab ID is for the current tab", () => {
-    test("returns empty response", async () => {
-        const response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
-        expect(response).toEqual({});
-    });
-});
-
-describe("if tab with ID does not exist", () => {
-    test("fetches next article without specifying tab ID", async () => {
-        tabs.isCurrentTab = jest.fn(() => { throw new Error("test error"); });
-        tabs.getCurrentTab = jest.fn(() => { return { id: OTHER_TAB_ID, windowId: WINDOW_ID }; });
-
-        const response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: TAB_ID } as IEvent);
-
-        expect(rootHandler.handle).toHaveBeenCalledTimes(1);
-        expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", token: ACCESS_TOKEN, windowId: WINDOW_ID, tabId: OTHER_TAB_ID });
-    });
-});
-
-describe("if the tab ID is for a tab other than the current tab", () => {
-    let response;
+describe("When tab ID is current tab", () => {
+    let result: IResponse;
     beforeEach(async () => {
-        tabs.updateTab = jest.fn((tabId, props) => { return { id: tabId, windowId: OTHER_WINDOW_ID }; });
-        response = await eventHandler.handle({ type: "POPUP_OPENED", token: ACCESS_TOKEN, windowId: OTHER_WINDOW_ID, tabId: OTHER_TAB_ID } as IEvent);
+        storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, null);
+        tabs.isCurrentTab = jest.fn(() => Promise.resolve(true));
+        result = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, storeData);
     });
 
-    test("makes the tab active", () => {
+    test("returns unmodified store", () => {
+        expect(result.store).toBe(storeData);
+    });
+});
+
+describe("When tab ID is not current tab", () => {
+    let result: IResponse;
+    beforeEach(async () => {
+        storeData = new StoreDataMap(ACCESS_TOKEN, OTHER_TAB_ID, null);
+        tabs.isCurrentTab = jest.fn(() => Promise.resolve(false));
+        tabs.updateTab = jest.fn((id) => Promise.resolve({ id, windowId: OTHER_WINDOW_ID }));
+        result = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, storeData);
+    });
+
+    test("makes the tab active", async () => {
         expect(tabs.updateTab).toHaveBeenCalledTimes(1);
         expect(tabs.updateTab).toHaveBeenCalledWith(OTHER_TAB_ID, { active: true });
     });
 
-    test("focusses the tab's window", () => {
+    test("focuses the window", () => {
         expect(tabs.updateWindow).toHaveBeenCalledTimes(1);
         expect(tabs.updateWindow).toHaveBeenCalledWith(OTHER_WINDOW_ID, { active: true });
     });
 
-    test("returns close response", () => {
-        expect(response).toEqual({ close: true });
+    test("returns unmodified store", () => {
+        expect(result.store).toBe(storeData);
+    });
+
+    test("response tells popup to close", () => {
+        expect(result.close).toBe(true);
     });
 });
 
+describe("When updating the tab throws an error", () => {
+    const expectedStore = new StoreDataMap(ACCESS_TOKEN, null, null);
+    let result: IResponse;
+    beforeEach(async () => {
+        storeData = new StoreDataMap(ACCESS_TOKEN, OTHER_TAB_ID, null);
+        tabs.isCurrentTab = jest.fn(() => Promise.resolve(false));
+        tabs.updateTab = jest.fn(() => { throw new Error("test error"); });
+        rootHandler.handle = jest.fn((event, store) => Promise.resolve({ test: true, store }));
+        result = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, storeData);
+    });
+
+    test("fetches next article after removing tab ID from store", () => {
+        expect(rootHandler.handle).toHaveBeenCalledTimes(1);
+        expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, expectedStore);
+    });
+
+    test("returns result from fetching next article", () => {
+        expect(result).toEqual({ test: true, store: expectedStore });
+    });
+});
