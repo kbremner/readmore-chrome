@@ -10,7 +10,7 @@
     "build": "node ./scripts/build.js",
     "prebuild": "npm run clean && npm run tsc",
     "clean": "rimraf dist && mkdir dist && rimraf tmp && mkdir tmp",
-    "lint": "tslint -c ./tslint.json 'src/**/*.ts'",
+    "lint": "tslint -c ./tslint.json 'src/**/*.ts' '__tests__/**/*.ts'",
     "pretsc": "npm run lint"
   },
   "author": "",

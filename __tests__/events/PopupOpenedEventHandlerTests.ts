@@ -1,13 +1,13 @@
-jest.mock('../../src/events');
-jest.mock('../../src/tabs');
+jest.mock("../../src/events");
+jest.mock("../../src/tabs");
 
-import PopupOpenedEventHandler from '../../src/events/PopupOpenedEventHandler';
-import { IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
-import EventHandler from '../../src/events';
+import EventHandler from "../../src/events";
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import PopupOpenedEventHandler from "../../src/events/PopupOpenedEventHandler";
+import { IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let storeData: IStoreData;
 let tabs: ITabManager;

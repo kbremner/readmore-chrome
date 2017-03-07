@@ -1,20 +1,20 @@
-jest.mock('../../src/tabs');
-jest.mock('../../src/actions');
-jest.mock('../../src/events/TokenReceivedEventHandler');
-jest.mock('../../src/events/FetchNextEventHandler');
-jest.mock('../../src/events/PopupOpenedEventHandler');
-jest.mock('../../src/events/PerformActionEventHandler');
-jest.mock('../../src/events/InstalledEventHandler');
-jest.mock('../../src/events/PerformAuthEventHandler');
+jest.mock("../../src/tabs");
+jest.mock("../../src/actions");
+jest.mock("../../src/events/TokenReceivedEventHandler");
+jest.mock("../../src/events/FetchNextEventHandler");
+jest.mock("../../src/events/PopupOpenedEventHandler");
+jest.mock("../../src/events/PerformActionEventHandler");
+jest.mock("../../src/events/InstalledEventHandler");
+jest.mock("../../src/events/PerformAuthEventHandler");
 
-import RootEventHandler from '../../src/events/RootEventHandler';
-import { IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import IActions from '../../src/actions/IActions';
-import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
+import Actions from "../../src/actions";
+import IActions from "../../src/actions/IActions";
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import RootEventHandler from "../../src/events/RootEventHandler";
+import { IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let storeData: IStoreData;
 let tabs: ITabManager;
@@ -48,7 +48,8 @@ test("throws an error if event type not supported", async () => {
     try {
         await eventHandler.handle({ type: "INVALID" } as any, storeData);
         fail("Expected error");
-    } catch(err) {
+    } catch (err) {
+        // no-op
     }
 });
 
@@ -83,4 +84,3 @@ function testsForCommand(commandName: string) {
         });
     };
 }
-

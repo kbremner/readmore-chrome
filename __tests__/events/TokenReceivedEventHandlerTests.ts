@@ -1,13 +1,13 @@
-jest.mock('../../src/events');
-jest.mock('../../src/tabs');
+jest.mock("../../src/events");
+jest.mock("../../src/tabs");
 
-import TokenReceivedEventHandler from '../../src/events/TokenReceivedEventHandler';
-import { IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
-import EventHandler from '../../src/events';
+import EventHandler from "../../src/events";
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import TokenReceivedEventHandler from "../../src/events/TokenReceivedEventHandler";
+import { IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let storeData: IStoreData;
 let otherStoreData: IStoreData;
@@ -32,7 +32,9 @@ beforeEach(async () => {
     tabs.getCurrentTab = jest.fn(() => Promise.resolve({ id: TAB_ID }));
 
     eventHandler = new TokenReceivedEventHandler(tabs, rootHandler);
-    response = await eventHandler.handle({ type: "TOKEN_RECEIVED", token: NEW_ACCESS_TOKEN, windowId: WINDOW_ID }, storeData);
+    response = await eventHandler.handle(
+        { type: "TOKEN_RECEIVED", token: NEW_ACCESS_TOKEN, windowId: WINDOW_ID },
+        storeData);
 });
 
 test("returns result telling the popup to keep the spinner up", () => {

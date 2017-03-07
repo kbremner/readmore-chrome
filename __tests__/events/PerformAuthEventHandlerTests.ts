@@ -1,11 +1,11 @@
-jest.mock('../../src/tabs');
+jest.mock("../../src/tabs");
 
-import PerformAuthEventHandler from '../../src/events/PerformAuthEventHandler';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
-import { IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import PerformAuthEventHandler from "../../src/events/PerformAuthEventHandler";
+import { IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let tabs: ITabManager;
 let storeData: IStoreData;
@@ -24,8 +24,8 @@ beforeEach(async () => {
     eventHandler = new PerformAuthEventHandler(tabs);
     window.chrome = {
         extension: {
-            getURL: jest.fn((url) => POPUP_URL)
-        }
+            getURL: jest.fn((url) => POPUP_URL),
+        },
     } as any;
     result = await eventHandler.handle({ type: "PERFORM_AUTH", windowId: WINDOW_ID }, storeData);
 });

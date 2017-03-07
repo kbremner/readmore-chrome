@@ -1,10 +1,10 @@
-jest.mock('../../src/events');
+jest.mock("../../src/events");
 
-import InstalledEventHandler from '../../src/events/InstalledEventHandler';
-import { default as IEventHandler, IEvent } from '../../src/events/IEventHandler';
-import EventHandler from '../../src/events';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import { IStoreData } from '../../src/storage/IStorageManager';
+import EventHandler from "../../src/events";
+import { default as IEventHandler, IEvent } from "../../src/events/IEventHandler";
+import InstalledEventHandler from "../../src/events/InstalledEventHandler";
+import { IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
 
 let rootHandler: IEventHandler;
 let eventHandler: InstalledEventHandler;
@@ -26,7 +26,9 @@ describe("If first install", () => {
     let result: any;
     beforeEach(async () => {
         rootHandler.handle = jest.fn(() => Promise.resolve(EXPECTED_RESPONSE));
-        result = await eventHandler.handle({ type: "INSTALLED", command: "install", windowId: WINDOW_ID } as IEvent, storeData);
+        result = await eventHandler.handle(
+            { type: "INSTALLED", command: "install", windowId: WINDOW_ID } as IEvent,
+            storeData);
     });
 
     test("starts auth process", async () => {
@@ -42,7 +44,9 @@ describe("If first install", () => {
 describe("If not first install", () => {
     let result: any;
     beforeEach(async () => {
-        result = await eventHandler.handle({ type: "INSTALLED", command: "other", windowId: WINDOW_ID } as IEvent, storeData);
+        result = await eventHandler.handle(
+            { type: "INSTALLED", command: "other", windowId: WINDOW_ID } as IEvent,
+            storeData);
     });
 
     test("doesn't trigger any events", async () => {

@@ -1,16 +1,16 @@
-jest.mock('../../src/events');
-jest.mock('../../src/actions');
-jest.mock('../../src/tabs');
+jest.mock("../../src/events");
+jest.mock("../../src/actions");
+jest.mock("../../src/tabs");
 
-import PerformActionEventHandler from '../../src/events/PerformActionEventHandler';
-import { default as IStorageManager, IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import { default as IActions, IArticleActions } from '../../src/actions/IActions';
-import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
-import EventHandler from '../../src/events';
+import Actions from "../../src/actions";
+import { default as IActions, IArticleActions } from "../../src/actions/IActions";
+import EventHandler from "../../src/events";
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import PerformActionEventHandler from "../../src/events/PerformActionEventHandler";
+import { default as IStorageManager, IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let storeData: IStoreData;
 let tabs: ITabManager;
@@ -29,7 +29,7 @@ beforeEach(async () => {
     tabs = new TabManager();
     actions = new Actions();
     rootHandler = new EventHandler(tabs, actions);
-    storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, { "archive": ARCHIVE_URL } as IArticleActions);
+    storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, { archive: ARCHIVE_URL } as IArticleActions);
 
     // update storage.get to return sensible defaults for these tests
     rootHandler.handle = jest.fn(() => Promise.resolve(EXPECTED_RESPONSE));

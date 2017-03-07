@@ -1,14 +1,14 @@
-jest.mock('../../src/actions');
-jest.mock('../../src/tabs');
+jest.mock("../../src/actions");
+jest.mock("../../src/tabs");
 
-import FetchNextEventHandler from '../../src/events/FetchNextEventHandler';
-import { default as IStorageManager, IStoreData } from '../../src/storage/IStorageManager';
-import StoreDataMap from '../../src/storage/StoreDataMap';
-import ITabManager from '../../src/tabs/ITabManager';
-import TabManager from '../../src/tabs';
-import IActions from '../../src/actions/IActions';
-import Actions from '../../src/actions';
-import { default as IEventHandler, IEvent, IResponse } from '../../src/events/IEventHandler';
+import Actions from "../../src/actions";
+import IActions from "../../src/actions/IActions";
+import FetchNextEventHandler from "../../src/events/FetchNextEventHandler";
+import { default as IEventHandler, IEvent, IResponse } from "../../src/events/IEventHandler";
+import { default as IStorageManager, IStoreData } from "../../src/storage/IStorageManager";
+import StoreDataMap from "../../src/storage/StoreDataMap";
+import TabManager from "../../src/tabs";
+import ITabManager from "../../src/tabs/ITabManager";
 
 let storeData: IStoreData;
 let updatedStore: IStoreData;
@@ -37,7 +37,6 @@ beforeEach(async () => {
 });
 
 describe("when tab ID is set", () => {
-    let result: IResponse;
     beforeEach(async () => {
         storeData = new StoreDataMap(ACCESS_TOKEN, TAB_ID, null);
         tabs.updateTab = jest.fn(() => Promise.resolve());
@@ -64,7 +63,6 @@ describe("when tab ID is set", () => {
 });
 
 describe("when tab ID is not set", () => {
-    let result: IResponse;
     beforeEach(async () => {
         storeData = new StoreDataMap(ACCESS_TOKEN, undefined, null);
         tabs.createTab = jest.fn(() => Promise.resolve({ id: NEW_TAB_ID }));
