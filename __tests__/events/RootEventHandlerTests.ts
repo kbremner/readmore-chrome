@@ -57,7 +57,7 @@ function testsForCommand(commandName: string) {
         let result: IResponse;
         let handler: IEventHandler;
         beforeEach(() => {
-            handler = (eventHandler as any)._handlers[commandName];
+            handler = (eventHandler as any).handlers[commandName];
             handler.handle = jest.fn(() => Promise.resolve({ test: true, store: EXPECTED_STORE }));
         });
 
