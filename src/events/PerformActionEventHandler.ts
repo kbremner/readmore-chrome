@@ -16,7 +16,7 @@ class PerformActionEventHandler implements IEventHandler {
     public async handle(event: IEvent, data: IStoreData): Promise<IResponse> {
         await this.actions.performAction(data.getActions()[this.actionName]);
         data = data.setActions(null);
-        return await this.eventHandler.handle({ type: "FETCHNEXT", windowId: event.windowId } as IEvent, data);
+        return await this.eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId } as IEvent, data);
     }
 }
 

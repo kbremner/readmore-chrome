@@ -28,7 +28,7 @@ class PopupOpenedEventHandler implements IEventHandler {
         } catch (err) {
             // tab doesn"t exist anymore, load the next article
             data = data.setTabId(null);
-            return await this.eventHandler.handle({ type: "FETCHNEXT", windowId: event.windowId }, data);
+            return await this.eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId }, data);
         }
     }
 }
