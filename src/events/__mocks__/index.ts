@@ -1,9 +1,9 @@
-import { default as IEventHandler, IEvent, IResponse } from '../IEventHandler';
-import ITabManager from '../../tabs/ITabManager';
-import IActions from '../../actions/IActions';
+import IActions from "../../actions/IActions";
+import ITabManager from "../../tabs/ITabManager";
+import { default as IEventHandler, IEvent, IResponse } from "../IEventHandler";
 
 class MockEventHandler implements IEventHandler {
-    handle: (event: IEvent) => Promise<IResponse>
+    public handle: (event: IEvent) => Promise<IResponse>;
 
     constructor(tabs: ITabManager, actions: IActions) {
         this.handle = jest.fn(() => Promise.resolve());

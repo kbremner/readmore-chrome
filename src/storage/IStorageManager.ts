@@ -1,8 +1,8 @@
-import { IArticleActions } from '../actions/IActions';
+import { IArticleActions } from "../actions/IActions";
 
 interface IStorageManager {
-    getAll(): Promise<IStoreData>
-    update(data: IStoreData): Promise<void>
+    getAll(): Promise<IStoreData>;
+    update(data: IStoreData): Promise<void>;
 }
 
 export interface IStoreData {

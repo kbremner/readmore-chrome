@@ -1,8 +1,8 @@
-import { default as IStorageManager, IStoreData } from '../IStorageManager';
+import { default as IStorageManager, IStoreData } from "../IStorageManager";
 
 class MockStorageManager implements IStorageManager {
-    getAll: () => Promise<IStoreData>
-    update: (data: IStoreData) => Promise<void>
+    public getAll: () => Promise<IStoreData>;
+    public update: (data: IStoreData) => Promise<void>;
 
     constructor() {
         this.getAll = jest.fn((keys) => Promise.resolve({}));

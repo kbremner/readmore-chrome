@@ -1,2 +1,2 @@
-import ChromeStorageManager from './ChromeStorageManager';
+import ChromeStorageManager from "./ChromeStorageManager";
 export default ChromeStorageManager;

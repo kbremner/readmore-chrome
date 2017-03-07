@@ -1,22 +1,22 @@
-import IActions from '../actions/IActions';
-import { default as IEventHandler, IEvent, IResponse } from './IEventHandler';
-import { IStoreData } from '../storage/IStorageManager';
+import IActions from "../actions/IActions";
+import { IStoreData } from "../storage/IStorageManager";
+import { default as IEventHandler, IEvent, IResponse } from "./IEventHandler";
 
 class PerformActionEventHandler implements IEventHandler {
-    private _actionName: string
-    private _eventHandler: IEventHandler
-    private _actions: IActions
+    private actionName: string;
+    private eventHandler: IEventHandler;
+    private actions: IActions;
 
     constructor(actionName: string, actions: IActions, eventHandler: IEventHandler) {
-        this._actionName = actionName;
-        this._actions = actions;
-        this._eventHandler = eventHandler;
+        this.actionName = actionName;
+        this.actions = actions;
+        this.eventHandler = eventHandler;
     }
 
-    async handle(event: IEvent, data: IStoreData): Promise<IResponse> {
-        await this._actions.performAction(data.getActions()[this._actionName]);
+    public async handle(event: IEvent, data: IStoreData): Promise<IResponse> {
+        await this.actions.performAction(data.getActions()[this.actionName]);
         data = data.setActions(null);
-        return await this._eventHandler.handle({ type: "FETCH_NEXT", windowId: event.windowId } as IEvent, data);
+        return await this.eventHandler.handle({ type: "FETCHNEXT", windowId: event.windowId } as IEvent, data);
     }
 }
 

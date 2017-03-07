@@ -1,2 +1,2 @@
-import RootEventHandler from './RootEventHandler';
+import RootEventHandler from "./RootEventHandler";
 export default RootEventHandler;

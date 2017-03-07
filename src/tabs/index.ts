@@ -1,2 +1,2 @@
-import ChromeTabManager from './ChromeTabManager';
+import ChromeTabManager from "./ChromeTabManager";
 export default ChromeTabManager;

@@ -1,8 +1,8 @@
-import { default as IActions, IArticle } from '../IActions';
+import { default as IActions, IArticle } from "../IActions";
 
 class MockActions implements IActions {
-    next: (token: string) => Promise<IArticle>
-    performAction: (actionUrl: string) => Promise<{}>
+    public next: (token: string) => Promise<IArticle>;
+    public performAction: (actionUrl: string) => Promise<{}>;
 
     constructor() {
         this.next = jest.fn(() => Promise.resolve({}));
