@@ -4,7 +4,6 @@ jest.mock('../../src/events/TokenReceivedEventHandler');
 jest.mock('../../src/events/FetchNextEventHandler');
 jest.mock('../../src/events/PopupOpenedEventHandler');
 jest.mock('../../src/events/PerformActionEventHandler');
-jest.mock('../../src/events/CommandReceivedEventHandler');
 jest.mock('../../src/events/InstalledEventHandler');
 jest.mock('../../src/events/PerformAuthEventHandler');
 
@@ -37,7 +36,6 @@ beforeEach(async () => {
     eventHandler = new RootEventHandler(tabs, actions);
 });
 
-describe("For COMMAND_RECEIVED event", testsForCommand("COMMAND_RECEIVED"));
 describe("For FETCH_NEXT event", testsForCommand("FETCH_NEXT"));
 describe("For HANDLE_ARCHIVE event", testsForCommand("HANDLE_ARCHIVE"));
 describe("For HANDLE_DELETE event", testsForCommand("HANDLE_DELETE"));

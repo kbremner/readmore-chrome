@@ -24,30 +24,5 @@
   "permissions": [
     "activeTab",
     "storage"
-  ],
-  "commands": {
-    "_execute_browser_action": {
-      "suggested_key": {
-        "default": "Alt+Shift+R"
-      }
-    },
-    "FETCH_NEXT": {
-      "description": "Fetch the next article",
-      "suggested_key": {
-        "default": "Alt+Shift+N"
-      }
-    },
-    "HANDLE_ARCHIVE": {
-      "description": "Archive the current article",
-      "suggested_key": {
-        "default": "Alt+Shift+A"
-      }
-    },
-    "HANDLE_DELETE": {
-      "description": "Delete the current article",
-      "suggested_key": {
-        "default": "Alt+Shift+D"
-      }
-    }
-  }
+  ]
 }

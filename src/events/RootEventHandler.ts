@@ -2,7 +2,6 @@ import TokenReceivedEventHandler from './TokenReceivedEventHandler';
 import FetchNextEventHandler from './FetchNextEventHandler';
 import PopupOpenedEventHandler from './PopupOpenedEventHandler';
 import PerformActionEventHandler from './PerformActionEventHandler';
-import CommandReceivedEventHandler from './CommandReceivedEventHandler';
 import InstalledEventHandler from './InstalledEventHandler';
 import PerformAuthEventHandler from './PerformAuthEventHandler';
 import { IStoreData } from '../storage/IStorageManager';
@@ -17,7 +16,6 @@ class RootEventHandler implements IEventHandler {
     constructor(tabs: ITabManager, actions: IActions) {
         this._tabs = tabs;
         this._handlers = {
-            "COMMAND_RECEIVED": new CommandReceivedEventHandler(tabs, this),
             "FETCH_NEXT": new FetchNextEventHandler(tabs, actions),
             "HANDLE_ARCHIVE": new PerformActionEventHandler("archive", actions, this),
             "HANDLE_DELETE": new PerformActionEventHandler("delete", actions, this),
