@@ -10,7 +10,6 @@ const tabs = new TabManager();
 const actions = new Actions();
 const eventHandler = new EventHandler(tabs, actions);
 
-chrome.commands.onCommand.addListener(handleCommand);
 chrome.runtime.onInstalled.addListener(handleInstall);
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     handleMessage(request, sender, sendResponse);
