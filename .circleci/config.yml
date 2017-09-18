@@ -37,3 +37,10 @@ jobs:
       - run: yarn test
 
       - run: yarn build
+
+deployment:
+  master:
+    branch: master
+    owner: defining-technology
+    commands:
+      - yarn run publish
