@@ -38,9 +38,9 @@ jobs:
 
       - run: yarn build
 
-deployment:
-  master:
-    branch: master
-    owner: defining-technology
-    commands:
-      - yarn run publish
+      - deploy:
+          name: Publish to Chrome Web Store
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              yarn run publish
+            fi
