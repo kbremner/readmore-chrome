@@ -5,7 +5,7 @@ const copyfiles = require('copyfiles');
 const packageJson = require('../package.json');
 
 const baseUri = process.env.BASE_URI || 'https://read-more-api.herokuapp.com';
-const buildNumber = process.env.BUILD_NUMBER || '0';
+const buildNumber = process.env.CIRCLE_BUILD_NUM || '0';
 
 manifest.version = `${packageJson.version}.${buildNumber}`;
 manifest.permissions.push(baseUri + '/');
