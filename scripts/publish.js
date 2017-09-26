@@ -35,8 +35,18 @@ zip(distDir, distZip)
             fs.readFileSync(distZip),
             { Authorization: `Bearer ${access_token}` }
         )
+            .then(console.log)
+            .then(() =>
+                request(
+                    'POST',
+                    `/chromewebstore/v1.1/items/${PUBLISH_EXTENSION_ID}/publish`,
+                    'application/json',
+                    '{}',
+                    { Authorization: `Bearer ${access_token}` }
+                )
+            )
+            .then(console.log)
     )
-    .then(result => console.log('Upload successful!', result))
     .catch(err => console.error('Upload failed', err));
 
 function zip(folderPath, destPath) {
