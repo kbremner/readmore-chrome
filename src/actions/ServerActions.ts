@@ -1,8 +1,10 @@
-import {default as IActions, IArticle } from "./IActions";
+import { default as IActions, IArticle } from "./IActions";
 
 class ServerActions implements IActions {
     public next(accessToken: string): Promise<IArticle> {
-        return get(`$baseUri/api/pocket/next?xAccessToken=${accessToken}`);
+        return accessToken
+            ? get(`$baseUri/api/pocket/next?xAccessToken=${accessToken}`)
+            : Promise.reject(new Error("Invalid access token"));
     }
 
     public performAction(actionUrl: string): Promise<{}> {
