@@ -13,6 +13,10 @@ class PopupOpenedEventHandler implements IEventHandler {
 
     public async handle(event: IEvent, data: IStoreData): Promise<IResponse> {
         try {
+            if (!data.getTabId()) {
+                throw new Error("No tab yet");
+            }
+
             const isCurrent = await this.tabs.isCurrentTab(data.getTabId(), event.windowId);
             if (isCurrent) {
                 // no action taken, return an empty response

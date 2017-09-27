@@ -87,3 +87,23 @@ describe("When updating the tab throws an error", () => {
         expect(result).toEqual({ test: true, store: expectedStore });
     });
 });
+
+describe("When no tab ID is specified", () => {
+    let result: IResponse;
+    beforeEach(async () => {
+        storeData = new StoreDataMap(ACCESS_TOKEN, null, null);
+        tabs.isCurrentTab = jest.fn(() => Promise.resolve(false));
+        tabs.updateTab = jest.fn((id) => Promise.resolve({ id, windowId: OTHER_WINDOW_ID }));
+        rootHandler.handle = jest.fn((event, store) => Promise.resolve({ test: true, store }));
+        result = await eventHandler.handle({ type: "POPUP_OPENED", windowId: WINDOW_ID } as IEvent, storeData);
+    });
+
+    test("fetches next article after removing tab ID from store", () => {
+        expect(rootHandler.handle).toHaveBeenCalledTimes(1);
+        expect(rootHandler.handle).toHaveBeenCalledWith({ type: "FETCH_NEXT", windowId: WINDOW_ID }, storeData);
+    });
+
+    test("returns result from fetching next article", () => {
+        expect(result).toEqual({ test: true, store: storeData });
+    });
+});
