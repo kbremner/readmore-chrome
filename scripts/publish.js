@@ -51,7 +51,7 @@ zip(distDir, distZip)
 
 function zip(folderPath, destPath) {
     return new Promise((resolve, reject) => {
-        zipFolder(folderPath, destPath, function(err) {
+        zipFolder(folderPath, destPath, function (err) {
             if (err) {
                 reject(err);
             } else {
@@ -77,7 +77,9 @@ function request(method, path, contentType, payload, headers = {}) {
                 });
                 resp.on('end', () => {
                     const json = JSON.parse(data);
-                    if (json.error) {
+                    if (resp.statusCode !== 200) {
+                        reject(json);
+                    } else if (json.error) {
                         reject(json);
                     } else {
                         resolve(json);
