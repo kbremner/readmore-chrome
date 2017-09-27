@@ -8,10 +8,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
     const authError = getQueryVariable("error");
     if (authError) {
         console.error("Failed to complete authentication:", authError);
-        document.getElementById("react-root").textContent =
-            "Failed to complete authentication. Did you grant access to your pocket account?";
+        document.getElementById("auth-error-msg").style.display = null;
+        document.getElementById("auth-retry").onclick = sendEvent.bind(null, { type: "PERFORM_AUTH" });
         return;
     }
+
+    document.getElementById("react-root").style.display = null;
 
     // if we've been redirected to this page and there's an access token, need to store it
     const accessToken = getQueryVariable("xAccessToken");

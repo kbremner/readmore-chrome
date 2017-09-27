@@ -73,15 +73,15 @@ p {
     padding: 0.3em;
 }
 
-p:hover {
+#react-root p:hover {
     background-color: #575F73;
 }
 
-p:active {
+#react-root p:active {
     background-color: #bfc9d3;
 }
 
-span {
+#react-root span {
     font-size: 60%;
     text-align: center;
     display: block;
@@ -94,4 +94,12 @@ a {
 
 a:hover {
     text-decoration: none;
+}
+
+#auth-error-msg {
+    position: absolute;
+}
+
+#auth-error-msg a {
+    padding: 0.3em;
 }
