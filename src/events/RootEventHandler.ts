@@ -16,7 +16,7 @@ class RootEventHandler implements IEventHandler {
     constructor(tabs: ITabManager, actions: IActions) {
         this.tabs = tabs;
         this.handlers = {
-            FETCH_NEXT: new FetchNextEventHandler(tabs, actions),
+            FETCH_NEXT: new FetchNextEventHandler(tabs, actions, this),
             HANDLE_ARCHIVE: new PerformActionEventHandler("archive", actions, this),
             HANDLE_DELETE: new PerformActionEventHandler("delete", actions, this),
             INSTALLED: new InstalledEventHandler(this),
